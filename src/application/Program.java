@@ -1,26 +1,43 @@
 package application;
 
-import java.util.Locale;
+import java.io.BufferedReader;
+import java.io.FileReader;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
 
-import entities.Account;
-import exceptions.WithdrawException;
+import entities.Product;
 
 public class Program {
 
 	public static void main(String[] args) {
 		
-		Locale.setDefault(Locale.US);
+		String path = "c:\\arquivocsv\\products.csv";
 		
-		Account account = new Account(1234, "welton", 1000.0, 500.0);
-		System.out.println(account);
+		List<Product> products = new ArrayList<>();
 		
-		System.out.println("----SAQUE-----");
-		
-		try {
-			account.withdraw(550.0);
-		} catch (WithdrawException e) {
-			System.out.println("Error in withdraw: " + e.getMessage());
+		try (BufferedReader br = new BufferedReader(new FileReader(path))){
+			
+			String line = br.readLine();
+			while (line != null) {
+				String product[] = line.split(",");
+				String name = product[0];
+				double value = Double.parseDouble(product[1]);
+				int quantity = Integer.parseInt(product[2]);
+				products.add(new Product(name,value,quantity));
+				line = br.readLine();
+			}
 		}
+		catch (IOException e) {
+			System.out.println("Error: " + e.getMessage());
+		}
+		
+		System.out.println("PRODUCTS:");
+		for (Product p: products) {
+			System.out.println(p);
+		}
+			
 	}
 
 }
