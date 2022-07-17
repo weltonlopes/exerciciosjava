@@ -1,54 +1,49 @@
 package application;
 
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
+import java.io.BufferedReader;
+import java.io.FileReader;
+import java.io.IOException;
+import java.util.LinkedHashMap;
+import java.util.Map;
 import java.util.Scanner;
-import java.util.Set;
-
-import model.entities.Course;
-import model.entities.Instructor;
-import model.entities.Student;
 
 public class Program {
 
 	public static void main(String[] args) {
-
+		
 		Scanner sc = new Scanner(System.in);
+		
+		System.out.print("Enter file full path: ");
+		String path = sc.nextLine();
+		Map<String, Integer> votes = new LinkedHashMap<>();
 
-		List<Course> list = new ArrayList<>();
-		list.add(new Course("A", null));
-		list.add(new Course("B", null));
-		list.add(new Course("C", null));
-		Instructor instructor = new Instructor("Alex", list);
+		try (BufferedReader br = new BufferedReader(new FileReader(path))) {
 
-		for (Course c : instructor.getCourse()) {
-
-			System.out.print("How many students for course " + c.getName() + "? ");
-			int num = sc.nextInt();
-			List<Student> students = new ArrayList<>();
-			for (int i = 0; i < num; i++) {
-				students.add(new Student(sc.nextInt()));
+			String line = br.readLine();
+			while (line != null) {
+				String[] fields = line.split(",");
+				String name = fields[0];
+				int count = Integer.parseInt(fields[1]);
+				if (votes.containsKey(name)) {
+					int votesSoFar = votes.get(name);
+					votes.put(name, votesSoFar + count);
+				}
+				else {
+					votes.put(name, count);
+				}
+				line = br.readLine();
 			}
-			c.setStudents(students);
+
+		} catch (IOException e) {
+			System.out.println(e.getMessage());
 		}
-
-		Set<Student> total = new HashSet<>();
-		for (Course c : instructor.getCourse()) {
-			total.addAll(c.getStudents());
-		}	
 		
+		for(String key: votes.keySet()) {
+			System.out.println(key + " " + votes.get(key)); 
+		}
 		
-		System.out.print(instructor.getName() 
-				+ " has " 
-				+ instructor.getCourse().size() 
-				+ " courses "
-				+ "and " 
-				+ total.size() 
-				+ " students");
-		
-
 		sc.close();
+		
 
 	}
 
